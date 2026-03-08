@@ -98,17 +98,22 @@ else:
 # ======================================================================================
 
 @st.cache_resource
-def load_sentiment_pipeline(model_path="uyahhh/indobert-coretax"):
-    if not os.path.isdir(model_path):
+def load_sentiment_pipeline():
+    model_name = "uyahhh/indobert-coretax" 
+    
+    try:
+        device = 0 if torch.cuda.is_available() else -1
+        sentiment_task = pipeline(
+            "text-classification",
+            model=model_name,
+            tokenizer=model_name,
+            device=device
+        )
+        return sentiment_task
+    except Exception as e:
+        # Menampilkan detail asli dari error kenapa gagal download
+        st.error(f"⚠️ GAGAL MENDOWNLOAD MODEL: {str(e)}")
         return None
-    device = 0 if torch.cuda.is_available() else -1
-    sentiment_task = pipeline(
-        "text-classification",
-        model=model_path,
-        tokenizer=model_path,
-        device=device
-    )
-    return sentiment_task
 
 def load_hp_data():
     try:
@@ -279,20 +284,20 @@ def page_demo():
     st.markdown("Masukkan teks tweet mengenai website Coretax untuk dianalisis oleh model terbaik.")
 
     pipe = load_sentiment_pipeline()
-    if pipe is None:
-        st.error("Model tidak ditemukan.")
-    else:
+    
+    if pipe is not None:
         text_input = st.text_area("Input Tweet:", placeholder="Contoh: Coretax keren banget!")
         if st.button("Analisis Sentimen"):
             if text_input and text_input.strip():
-                try:
-                    result = pipe(text_input.strip())[0]
-                    label, score = result['label'], result['score']
-                    if label.lower() == 'positive': st.success(f"**Hasil: Positif** (Keyakinan: {score:.2%})")
-                    elif label.lower() == 'negative': st.error(f"**Hasil: Negatif** (Keyakinan: {score:.2%})")
-                    else: st.info(f"**Hasil: Netral** (Keyakinan: {score:.2%})")
-                except Exception as e:
-                    st.error(f"Terjadi kesalahan: {str(e)}")
+                with st.spinner("Menganalisis..."):
+                    try:
+                        result = pipe(text_input.strip())[0]
+                        label, score = result['label'], result['score']
+                        if label.lower() == 'positive': st.success(f"**Hasil: Positif** (Keyakinan: {score:.2%})")
+                        elif label.lower() == 'negative': st.error(f"**Hasil: Negatif** (Keyakinan: {score:.2%})")
+                        else: st.info(f"**Hasil: Netral** (Keyakinan: {score:.2%})")
+                    except Exception as e:
+                        st.error(f"Terjadi kesalahan saat analisis: {str(e)}")
 
 # ======================================================================================
 # --- HALAMAN: ANALISIS SENTIMEN ---
@@ -346,3 +351,4 @@ elif page_selection == "Demo Model":
 elif page_selection == "Analisis Sentimen":
 
     page_sentimen()
+

@@ -16,6 +16,71 @@ st.set_page_config(
 )
 
 # ======================================================================================
+# --- POP-UP INFO MELAYANG (MUNCUL SEKALI SAAT PERTAMA DIBUKA) ---
+# ======================================================================================
+if 'pesan_awal' not in st.session_state:
+    st.session_state.pesan_awal = True # Menandai bahwa popup sudah ditampilkan
+    
+    info_html = """
+    <style>
+    /* Menyembunyikan checkbox (kita pakai logika checkbox untuk tombol X) */
+    #tutup-popup { display: none; }
+    
+    /* Desain Kotak Melayang */
+    .kotak-popup {
+        position: fixed;
+        top: 70px; /* Berada di bawah sedikit dari menu Streamlit */
+        right: 20px; /* Mepet ke pojok kanan */
+        background-color: #FFF3CD; /* Warna peringatan kuning lembut */
+        color: #856404;
+        padding: 15px 30px 15px 15px;
+        border-left: 5px solid #FFEBA8;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 999999; /* Memastikan selalu berada paling depan */
+        font-family: sans-serif;
+        font-size: 14px;
+        animation: geserMasuk 0.6s ease-out;
+    }
+    
+    /* Desain Tombol X (Close) */
+    .kotak-popup label {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 18px;
+        color: #856404;
+    }
+    
+    .kotak-popup label:hover {
+        color: red;
+    }
+    
+    /* Logika CSS: Jika label ditekan (checkbox aktif), sembunyikan kotak */
+    #tutup-popup:checked + .kotak-popup {
+        display: none;
+    }
+    
+    /* Animasi Pop-up muncul */
+    @keyframes geserMasuk {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    </style>
+    
+    <!-- Struktur HTML -->
+    <input type="checkbox" id="tutup-popup">
+    <div class="kotak-popup">
+        <label for="tutup-popup" title="Tutup">×</label>
+        <b>💡 Tips Tampilan</b><br>
+        Agar warna website sempurna, mohon pastikan pengaturan (⋮) di pojok kanan atas diset ke <b>Light Mode</b>.
+    </div>
+    """
+    st.markdown(info_html, unsafe_allow_html=True)
+
+# ======================================================================================
 # --- LOGIKA TEMA (DARK/LIGHT MODE) DENGAN TOGGLE ---
 # ======================================================================================
 st.sidebar.markdown("## 🧭 Navigasi")
@@ -351,4 +416,5 @@ elif page_selection == "Demo Model":
 elif page_selection == "Analisis Sentimen":
 
     page_sentimen()
+
 

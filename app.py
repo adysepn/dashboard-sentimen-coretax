@@ -98,7 +98,7 @@ else:
 # ======================================================================================
 
 @st.cache_resource
-def load_sentiment_pipeline(model_path="best_model"):
+def load_sentiment_pipeline(model_path="uyahhh/indobert-coretax"):
     if not os.path.isdir(model_path):
         return None
     device = 0 if torch.cuda.is_available() else -1
@@ -344,4 +344,5 @@ elif page_selection == "Penelitian":
 elif page_selection == "Demo Model":
     page_demo()
 elif page_selection == "Analisis Sentimen":
+
     page_sentimen()
